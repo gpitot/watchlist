@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SUPBASE_PASSWORD")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model books {
+  id            BigInt    @id @default(autoincrement())
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+  title         String?   @db.VarChar
+  image         String?   @db.VarChar
+  isbn          String?   @db.VarChar
+  isbn13        String?   @db.VarChar
+  status        String?   @db.VarChar
+  goodreads_url String?   @db.VarChar
+  library_url   String?   @db.VarChar
+  userid        BigInt
+  users         users     @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model movie_credits {
+  id         BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  movie_id   BigInt
+  name       String   @db.VarChar
+  role       String   @db.VarChar
+  movies     movies   @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model movie_providers {
+  id            BigInt   @id @default(autoincrement())
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  movie_id      BigInt
+  provider_type String   @db.VarChar
+  provider_name String   @db.VarChar
+  movies        movies   @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model movies {
+  id              BigInt            @id @default(autoincrement())
+  created_at      DateTime          @default(now()) @db.Timestamptz(6)
+  description     String?           @db.VarChar
+  release_date    DateTime?         @db.Date
+  production      String?           @db.VarChar
+  title           String            @db.VarChar
+  movie_credits   movie_credits[]
+  movie_providers movie_providers[]
+  movies_genres   movies_genres[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model movies_genres {
+  id         BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  movie_id   BigInt
+  genre      String?  @db.VarChar
+  movies     movies   @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model users {
+  id           BigInt    @id @default(autoincrement())
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  goodreads_id String    @db.VarChar
+  shelf        String    @db.VarChar
+  username     String    @db.VarChar
+  books        books[]
+}
